@@ -1,0 +1,31 @@
+#!/usr/bin/env ruby
+
+$:.unshift(File.expand_path(File.join(File.dirname(__FILE__), '../lib')))
+require 'coffeemaker'
+require 'optparse'
+
+options = {
+  :host => 'localhost',
+  :port => 6667,
+  :nick => 'coffeemaker'
+}
+
+OptionParser.new do |option|
+  option.banner = "Usage: coffeemaker [options]"
+  option.on('-p PORT', Numeric) { |port| options[:port] = port }
+  option.on('-h HOST') { |host| options[:host] = host }
+  option.on('-n NICK') { |nick| options[:nick] = nick }
+  option.on('--help') { puts option; exit }
+  begin
+    option.parse!
+  rescue OptionParser::RequiredArgument, OptionParser::InvalidOption
+    puts option
+    exit
+  end
+end
+
+EM.run do
+  bot = Coffeemaker::IRC.new(options)
+  bot.start
+  trap('INT') { bot.stop }
+end
