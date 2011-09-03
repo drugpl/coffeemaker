@@ -5,15 +5,19 @@ require 'coffeemaker'
 require 'optparse'
 
 options = {
-  :host => 'localhost',
-  :port => 6667,
+  :irc_host => 'localhost',
+  :irc_port => 6667,
+  :http_host => 'localhost',
+  :http_port => 8080,
   :nick => 'coffeemaker'
 }
 
 OptionParser.new do |option|
   option.banner = "Usage: coffeemaker [options]"
-  option.on('-p PORT', Numeric) { |port| options[:port] = port }
-  option.on('-h HOST') { |host| options[:host] = host }
+  option.on('--ip PORT', Numeric) { |port| options[:irc_port] = port }
+  option.on('--ih HOST') { |host| options[:irc_host] = host }
+  option.on('--hp PORT') { |port| options[:http_port] = port }
+  option.on('--hh HOST') { |host| options[:http_host] = host }
   option.on('-n NICK') { |nick| options[:nick] = nick }
   option.on('--help') { puts option; exit }
   begin
@@ -25,7 +29,13 @@ OptionParser.new do |option|
 end
 
 EM.run do
-  bot = Coffeemaker::IRC.new(options)
-  bot.start
-  trap('INT') { bot.stop }
+  irc  = Coffeemaker::IRC.new(options)
+  http = Coffeemaker::HTTP.new(options)
+  http.start(irc.start)
+
+  trap('INT') do
+    http.stop
+    irc.stop
+    EM.stop
+  end
 end

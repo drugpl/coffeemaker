@@ -19,4 +19,5 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
 
   s.add_runtime_dependency "eventmachine"
+  s.add_runtime_dependency "goliath", "0.9.2"
 end
