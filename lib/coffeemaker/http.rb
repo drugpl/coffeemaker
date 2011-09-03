@@ -1,5 +1,6 @@
 require 'coffeemaker'
 require 'coffeemaker/goliath'
+require 'json'
 
 module Coffeemaker
   class HTTP
@@ -23,7 +24,7 @@ module Coffeemaker
         env[IRC_CONNECTION].join(env[:channel])
 
         env[IRC_CONNECTION].on_message = Proc.new do |msg|
-          env.stream_send("#{msg.body}\n")
+          env.stream_send("#{msg.to_json}\n")
         end
         streaming_response(202, {'X-Stream' => 'Goliath'})
       end
