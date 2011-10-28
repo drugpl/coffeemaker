@@ -12,9 +12,11 @@ module Coffeemaker
           send_command :part, channel
         end
 
-        def message(recipient, text)
+        def privmsg(recipient, text)
           send_command :privmsg, recipient, ":#{text}"
         end
+
+        alias :msg :privmsg
       end
     end
   end
