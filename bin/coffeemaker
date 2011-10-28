@@ -1,41 +1,6 @@
 #!/usr/bin/env ruby
 
-$:.unshift(File.expand_path(File.join(File.dirname(__FILE__), '../lib')))
-require 'coffeemaker'
-require 'optparse'
+require 'coffeemaker/runner'
 
-options = {
-  :irc_host => 'localhost',
-  :irc_port => 6667,
-  :http_host => 'localhost',
-  :http_port => 8080,
-  :nick => 'coffeemaker'
-}
-
-OptionParser.new do |option|
-  option.banner = "Usage: coffeemaker [options]"
-  option.on('--ip PORT', Numeric) { |port| options[:irc_port] = port }
-  option.on('--ih HOST') { |host| options[:irc_host] = host }
-  option.on('--hp PORT') { |port| options[:http_port] = port }
-  option.on('--hh HOST') { |host| options[:http_host] = host }
-  option.on('-n NICK') { |nick| options[:nick] = nick }
-  option.on('--help') { puts option; exit }
-  begin
-    option.parse!
-  rescue OptionParser::RequiredArgument, OptionParser::InvalidOption
-    puts option
-    exit
-  end
-end
-
-EM.run do
-  irc  = Coffeemaker::IRC.new(options)
-  http = Coffeemaker::HTTP.new(options)
-  http.start(irc.start)
-
-  trap('INT') do
-    http.stop
-    irc.stop
-    EM.stop
-  end
-end
+cm = Coffeemaker::Runner.new(ARGV)
+cm.start

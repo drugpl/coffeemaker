@@ -7,9 +7,9 @@ Gem::Specification.new do |s|
   s.version     = Coffeemaker::VERSION
   s.authors     = ["Paweł Pacana"]
   s.email       = ["pawel.pacana@gmail.com"]
-  s.homepage    = ""
-  s.summary     = %q{TODO: Write a gem summary}
-  s.description = %q{TODO: Write a gem description}
+  s.homepage    = "http://drug.org.pl/projects/coffeemaker"
+  s.summary     = %q{IRC bot, how unexpected!}
+  s.description = %q{IRC bot that serves as foundation for greater ideas. "Not Invented Here" applies greatly.}
 
   s.rubyforge_project = "coffeemaker"
 
@@ -18,6 +18,6 @@ Gem::Specification.new do |s|
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ["lib"]
 
-  s.add_runtime_dependency "eventmachine"
-  s.add_runtime_dependency "goliath", "0.9.2"
+  s.add_runtime_dependency "eventmachine", "~> 1.0.0.beta.3"
+  s.add_runtime_dependency "activesupport"
 end
