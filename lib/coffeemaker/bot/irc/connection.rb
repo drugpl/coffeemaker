@@ -13,13 +13,14 @@ module Coffeemaker
         include ::EM::Protocols::LineText2
         include ::Coffeemaker::Bot::Irc::Commands
 
-        attr_accessor :port, :host, :nick, :on_message
+        attr_accessor :port, :host, :nick, :on_message, :on_connect
 
         def connection_completed
           @reconnecting = false
           @connected    = true
           _send_command :user, [@nick] * 4
           _send_command :nick, @nick
+          on_connect.call if on_connect
           succeed
         end
 
