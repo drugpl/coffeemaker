@@ -5,7 +5,7 @@ require 'active_support/core_ext/module/delegation'
 module Coffeemaker
   class Bot
     class Irc
-      attr_accessor :on_message
+      attr_accessor :on_message, :on_connect
       attr_reader   :host, :port, :nick, :connection
       private       :connection
 
@@ -24,6 +24,7 @@ module Coffeemaker
           c.port       = @port
           c.nick       = @nick
           c.on_message = @on_message
+          c.on_connect = @on_connect
         end
       end
 
