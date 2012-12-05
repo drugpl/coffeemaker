@@ -13,17 +13,15 @@ module Coffeemaker
         include ::EM::Protocols::LineText2
         include ::Coffeemaker::Bot::Irc::Commands
 
-        attr_accessor :port, :host, :nick, :on_message, :on_connect, :logger
+        attr_accessor :port, :host, :nick, :on_message, :on_connect, :logger, :ssl
 
         def connection_completed
-          @reconnecting = false
-          @connected    = true
-          @logger.info "--> connected to #{@host}:#{@port}"
+          return start_tls if @ssl
+          complete_connection
+        end
 
-          _send_command :user, [@nick] * 4
-          _send_command :nick, @nick
-          on_connect.call if on_connect
-          succeed
+        def ssl_handshake_completed
+          complete_connection
         end
 
         def receive_line(data)
@@ -65,6 +63,17 @@ module Coffeemaker
 
         def send_command(name, *args)
           callback { _send_command(name, *args) }
+        end
+
+        def complete_connection
+          @reconnecting = false
+          @connected    = true
+          @logger.info "--> connected to #{@host}:#{@port}"
+
+          _send_command :user, [@nick] * 4
+          _send_command :nick, @nick
+          on_connect.call if on_connect
+          succeed
         end
       end
     end

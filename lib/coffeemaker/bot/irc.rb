@@ -17,6 +17,7 @@ module Coffeemaker
         @nick       = options.delete(:nick)
         @on_message = options.delete(:on_message)
         @logger     = options.delete(:logger)
+        @ssl        = options.delete(:ssl)
       end
 
       def start
@@ -27,6 +28,7 @@ module Coffeemaker
           c.on_message = @on_message
           c.on_connect = @on_connect
           c.logger     = @logger
+          c.ssl        = @ssl
         end
       end
 
