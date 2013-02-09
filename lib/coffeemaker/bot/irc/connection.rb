@@ -13,7 +13,7 @@ module Coffeemaker
         include ::EM::Protocols::LineText2
         include ::Coffeemaker::Bot::Irc::Commands
 
-        attr_accessor :port, :host, :nick, :on_message, :on_connect, :logger, :ssl
+        attr_accessor :port, :host, :nick, :on_message, :on_connect, :logger, :ssl, :user, :pass
 
         def connection_completed
           return complete_connection unless @ssl
@@ -71,8 +71,11 @@ module Coffeemaker
           @connected    = true
           @logger.info "connected"
 
-          _send_command :user, [@nick] * 4
+          @logger.info "authenticating"
+          _send_command :user, [@user] * 4
+          _send_command :pass, @pass if @pass
           _send_command :nick, @nick
+
           on_connect.call if on_connect
           succeed
         end

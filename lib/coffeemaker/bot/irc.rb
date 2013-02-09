@@ -6,7 +6,7 @@ module Coffeemaker
   class Bot
     class Irc
       attr_accessor :on_message, :on_connect
-      attr_reader   :host, :port, :nick, :connection, :logger
+      attr_reader   :host, :port, :nick, :connection, :logger, :user, :pass
       private       :connection
 
       delegate :join, :part, :msg, :privmsg, to: :connection
@@ -15,6 +15,8 @@ module Coffeemaker
         @host       = options.delete(:irc_host)
         @port       = options.delete(:irc_port)
         @nick       = options.delete(:nick)
+        @pass       = options.delete(:pass)
+        @user       = options.delete(:user)
         @on_message = options.delete(:on_message)
         @logger     = options.delete(:logger)
         @ssl        = options.delete(:ssl)
@@ -24,6 +26,8 @@ module Coffeemaker
         @connection = EM.connect(@host, @port, Connection) do |c|
           c.host       = @host
           c.port       = @port
+          c.pass       = @pass
+          c.user       = @user
           c.nick       = @nick
           c.on_message = @on_message
           c.on_connect = @on_connect

@@ -33,6 +33,7 @@ module Coffeemaker
         irc_host: 'localhost',
         irc_port: 6667,
         nick: 'coffeemaker',
+        user: 'coffeemaker',
         channels: [],
         on_message: Proc.new { |msg| @logger.info(msg) if @logger },
         logfile: STDOUT,
@@ -45,6 +46,8 @@ module Coffeemaker
         option.default_argv = argv
         option.banner = "Usage: coffeemaker [options]"
         option.on('-n NICK') { |nick| @options[:nick] = nick }
+        option.on('-u USER') { |user| @options[:user] = user }
+        option.on('-w PASS') { |pass| @options[:pass] = pass }
         option.on('-p PORT', Numeric) { |port| @options[:irc_port] = port }
         option.on('-s HOST') { |host| @options[:irc_host] = host }
         option.on('-c CHANNELS', 'comma-separated list of channels') { |channels| @options[:channels] = channels.split }
