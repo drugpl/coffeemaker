@@ -30,6 +30,9 @@ module Coffeemaker
           @logger.debug "received #{data}"
 
           case msg.command
+          when :'001'
+            on_connect.call if on_connect
+            succeed
           when :ping
             send_command :pong
           when :privmsg, :topic, :part, :join
@@ -75,11 +78,6 @@ module Coffeemaker
           _send_command :user, [@user] * 4
           _send_command :pass, @pass if @pass
           _send_command :nick, @nick
-
-          EM.add_timer(1) do
-            on_connect.call if on_connect
-            succeed
-          end
         end
       end
     end
