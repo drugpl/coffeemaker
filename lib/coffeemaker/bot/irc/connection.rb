@@ -13,11 +13,13 @@ module Coffeemaker
         include ::EM::Protocols::LineText2
         include ::Coffeemaker::Bot::Irc::Commands
 
-        attr_accessor :port, :host, :nick, :on_message, :on_connect
+        attr_accessor :port, :host, :nick, :on_message, :on_connect, :logger
 
         def connection_completed
           @reconnecting = false
           @connected    = true
+          @logger.info "--> connected to #{@host}:#{@port}"
+
           _send_command :user, [@nick] * 4
           _send_command :nick, @nick
           on_connect.call if on_connect
@@ -26,6 +28,8 @@ module Coffeemaker
 
         def receive_line(data)
           msg = ::Coffeemaker::Bot::Irc::Message.new(data)
+          @logger.debug "--> received #{data}"
+
           case msg.command
           when :ping
             send_command :pong
@@ -35,9 +39,12 @@ module Coffeemaker
         end
 
         def unbind
+          @logger.info "--> diconnected"
+
           @deferred_status = nil
           if @connected or @reconnecting
             EM.add_timer(1) do
+              @logger.info "--> reconnecting"
               reconnect(@host, @port)
             end
             @connected    = false
@@ -49,8 +56,11 @@ module Coffeemaker
 
         private
         def _send_command(name, *args)
-          cmd = [name.to_s.upcase] + args
-          send_data("#{cmd.flatten.join(' ')}\r\n")
+          cmd  = [name.to_s.upcase] + args
+          data = "#{cmd.flatten.join(' ')}\r\n"
+
+          @logger.debug "--> sending #{data}"
+          send_data(data)
         end
 
         def send_command(name, *args)

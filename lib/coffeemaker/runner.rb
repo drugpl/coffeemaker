@@ -8,16 +8,14 @@ module Coffeemaker
     def initialize(argv)
       @options = default_options
       parse_options!(argv)
-
-      if logfile = @options.delete(:logfile)
-        @logger = Logger.new(logfile =~ /stdout/i ? STDOUT : logfile)
-      end
+      @logger = Logger.new(@options.delete(:logfile))
+      @logger.level = @options.delete(:log_level)
       @channels = @options.delete(:channels)
     end
 
     def start
       EM.run do
-        bot = Coffeemaker::Bot.new(@options)
+        bot = Coffeemaker::Bot.new(@options.merge(:logger => @logger))
         bot.start do |irc|
           @channels.each { |channel| irc.join(channel) }
         end
@@ -36,7 +34,9 @@ module Coffeemaker
         irc_port: 6667,
         nick: 'coffeemaker',
         channels: [],
-        on_message: Proc.new { |msg| @logger.info(msg) if @logger }
+        on_message: Proc.new { |msg| @logger.info(msg) if @logger },
+        logfile: STDOUT,
+        log_level: Logger::INFO
       }
     end
 
@@ -48,8 +48,9 @@ module Coffeemaker
         option.on('-p PORT', Numeric) { |port| @options[:irc_port] = port }
         option.on('-s HOST') { |host| @options[:irc_host] = host }
         option.on('-c CHANNELS', 'comma-separated list of channels') { |channels| @options[:channels] = channels.split }
-        option.on('-l LOG_FILE', 'path to log file or STDOUT') { |logfile| @options[:logfile] = logfile }
-        option.on('--help') { puts option; exit }
+        option.on('-l LOG_FILE', 'path to log file') { |logfile| @options[:logfile] = logfile }
+        option.on('-d', '--debug') { |debug| @options[:log_level] = Logger::DEBUG }
+        option.on_tail('--help') { puts option; exit }
         begin
           option.parse!
         rescue OptionParser::RequiredArgument, OptionParser::InvalidOption

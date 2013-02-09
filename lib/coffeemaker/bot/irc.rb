@@ -6,7 +6,7 @@ module Coffeemaker
   class Bot
     class Irc
       attr_accessor :on_message, :on_connect
-      attr_reader   :host, :port, :nick, :connection
+      attr_reader   :host, :port, :nick, :connection, :logger
       private       :connection
 
       delegate :join, :part, :msg, :privmsg, to: :connection
@@ -16,6 +16,7 @@ module Coffeemaker
         @port       = options.delete(:irc_port)
         @nick       = options.delete(:nick)
         @on_message = options.delete(:on_message)
+        @logger     = options.delete(:logger)
       end
 
       def start
@@ -25,6 +26,7 @@ module Coffeemaker
           c.nick       = @nick
           c.on_message = @on_message
           c.on_connect = @on_connect
+          c.logger     = @logger
         end
       end
 
