@@ -50,6 +50,7 @@ module Coffeemaker
         option.on('-c CHANNELS', 'comma-separated list of channels') { |channels| @options[:channels] = channels.split }
         option.on('-l LOG_FILE', 'path to log file') { |logfile| @options[:logfile] = logfile }
         option.on('-d', '--debug') { |debug| @options[:log_level] = Logger::DEBUG }
+        option.on('--ssl') { |ssl| @options[:ssl] = true }
         option.on_tail('--help') { puts option; exit }
         begin
           option.parse!

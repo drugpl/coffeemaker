@@ -16,17 +16,18 @@ module Coffeemaker
         attr_accessor :port, :host, :nick, :on_message, :on_connect, :logger, :ssl
 
         def connection_completed
-          return start_tls if @ssl
-          complete_connection
+          return complete_connection unless @ssl
+          start_tls
         end
 
         def ssl_handshake_completed
+          @logger.info "ssl handshake completed"
           complete_connection
         end
 
         def receive_line(data)
           msg = ::Coffeemaker::Bot::Irc::Message.new(data)
-          @logger.debug "--> received #{data}"
+          @logger.debug "received #{data}"
 
           case msg.command
           when :ping
@@ -37,12 +38,12 @@ module Coffeemaker
         end
 
         def unbind
-          @logger.info "--> diconnected"
+          @logger.info "diconnected"
 
           @deferred_status = nil
           if @connected or @reconnecting
             EM.add_timer(1) do
-              @logger.info "--> reconnecting"
+              @logger.info "reconnecting"
               reconnect(@host, @port)
             end
             @connected    = false
@@ -57,7 +58,7 @@ module Coffeemaker
           cmd  = [name.to_s.upcase] + args
           data = "#{cmd.flatten.join(' ')}\r\n"
 
-          @logger.debug "--> sending #{data}"
+          @logger.debug "sending #{data}"
           send_data(data)
         end
 
@@ -68,7 +69,7 @@ module Coffeemaker
         def complete_connection
           @reconnecting = false
           @connected    = true
-          @logger.info "--> connected to #{@host}:#{@port}"
+          @logger.info "connected"
 
           _send_command :user, [@nick] * 4
           _send_command :nick, @nick
