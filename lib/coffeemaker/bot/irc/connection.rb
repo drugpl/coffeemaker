@@ -76,8 +76,10 @@ module Coffeemaker
           _send_command :pass, @pass if @pass
           _send_command :nick, @nick
 
-          on_connect.call if on_connect
-          succeed
+          EM.add_timer(1) do
+            on_connect.call if on_connect
+            succeed
+          end
         end
       end
     end
